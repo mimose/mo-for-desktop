@@ -18,9 +18,9 @@ var css string
 func main() {
 
 	app := wails.CreateApp(&wails.AppConfig{
-		Width:  1024,
-		Height: 768,
-		Title:  "mo-for-desktop",
+		Width:  768,
+		Height: 576,
+		Title:  "mo",
 		JS:     js,
 		CSS:    css,
 		Colour: "#131313",

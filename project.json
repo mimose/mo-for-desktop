@@ -1,11 +1,11 @@
 {
  "name": "mo-for-desktop",
- "description": "Enter your project description",
+ "description": "mo",
  "author": {
   "name": "mimose",
   "email": "mimosecy@gmail.com"
  },
- "version": "0.1.0",
+ "version": "0.0.1-Beta",
  "binaryname": "mo-for-desktop",
  "frontend": {
   "dir": "frontend",
