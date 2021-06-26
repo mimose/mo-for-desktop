@@ -18,12 +18,13 @@ var css string
 func main() {
 
 	app := wails.CreateApp(&wails.AppConfig{
-		Width:  768,
-		Height: 576,
-		Title:  "mo",
-		JS:     js,
-		CSS:    css,
-		Colour: "#131313",
+		Width:     1000,
+		Height:    800,
+		Title:     "mo",
+		JS:        js,
+		CSS:       css,
+		Colour:    "#131313",
+		Resizable: true,
 	})
 	app.Bind(basic)
 	app.Run()
