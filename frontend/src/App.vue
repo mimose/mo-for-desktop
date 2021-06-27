@@ -1,85 +1,41 @@
 <template>
-  <v-app id="inspire">
-    <v-app-bar
-      app
-      color="white"
-      flat
-    >
-      <v-container class="py-0 fill-height">
-        <v-avatar
-          class="mr-10"
-          color="grey darken-1"
-          size="32"
-        ></v-avatar>
-
-        <v-btn
-          v-for="link in links"
-          :key="link"
-          text
+    <v-app id="inspire">
+        <v-system-bar app 
+          height="36"
+          fixed
+          color="accent darken-4"  
         >
-          {{ link }}
-        </v-btn>
+          <v-banner single-line @click:icon="goHomePage">
+            <!-- <v-icon
+              slot="icon"
+              color="warning"
+              size="25"
+            >mdi-wifi-strength-alert-outline</v-icon> -->
+            <span style="color: white">built by mimose / mimosecy@gmail.com</span>
+          </v-banner>
+        </v-system-bar>
 
-        <v-spacer></v-spacer>
+        <v-navigation-drawer
+            v-model="drawer"
+            app
+            width="20%"
+            fixed
+            permanent
+        >
+            <moToolBar></moToolBar>
 
-        <v-responsive max-width="260">
-          <v-text-field
-            dense
-            flat
-            hide-details
-            rounded
-            solo-inverted
-          ></v-text-field>
-        </v-responsive>
-      </v-container>
-    </v-app-bar>
+            <!-- <v-sheet
+                color="grey lighten-5"
+                height="5%"
+                width="100%"
+            ></v-sheet> -->
+            
+            <record-list></record-list>
 
-    <v-main class="grey lighten-3">
-      <v-container>
-        <v-row>
-          <v-col cols="2">
-            <v-sheet rounded="lg">
-              <v-list color="transparent">
-                <v-list-item
-                  v-for="n in 5"
-                  :key="n"
-                  link
-                >
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      List Item {{ n }}
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
+        </v-navigation-drawer>
 
-                <v-divider class="my-2"></v-divider>
 
-                <v-list-item
-                  link
-                  color="grey lighten-4"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      Refresh
-                    </v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-sheet>
-          </v-col>
-
-          <v-col>
-            <v-sheet
-              min-height="70vh"
-              rounded="lg"
-            >
-              <!--  -->
-            </v-sheet>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
-  </v-app>
+    </v-app>
 </template>
 
 <script>
@@ -87,23 +43,25 @@ import "vuetify/dist/vuetify.min.css";
 import "./assets/css/main.css";
 import "material-design-icons-iconfont";
 
+import MoToolBar from './components/MoToolBar.vue';
+import RecordList from './components/RecordList.vue';
+
 export default {
-  name: "restoric",
+  name: "mo-app",
   data: () => ({
-    links: [
-      'Dashboard',
-      'Messages',
-      'Profile',
-      'Updates',
-    ],
-    activeItem: 0,
-    drawer: false
+    drawer: null,
   }),
   components: {
+    moToolBar: MoToolBar,
+    recordList: RecordList
+  },
+  computed: {
+  },
+  methods: {
+    goHomePage() {
+      window.open('https://www.baidu.com','_blank')
+    },
   }
 };
+
 </script>
-
-<style scoped>
-</style>
-
