@@ -1,8 +1,11 @@
 package group
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/mimose/gcosy/lib"
+	"io/ioutil"
 	"mo-for-desktop/services/storage"
 	"time"
 )
@@ -18,7 +21,45 @@ type Group struct {
 }
 
 func ListAll() []Group {
-	return nil
+	groups := []Group{}
+	groupDir := storage.LocalGroupDir()
+	bytes, err := FilesBytes(groupDir)
+	if err != nil {
+		// TODO log
+		fmt.Printf("[error] Group ListAll. %s", err)
+		return groups
+	}
+	if bytes == nil {
+		// TODO log
+		fmt.Printf("[error] Group ListAll. byte empty")
+		return groups
+	}
+	for _, byte := range bytes {
+		var group Group
+		json.Unmarshal(byte, &group)
+		groups = append(groups, group)
+	}
+	return groups
+}
+
+func FilesBytes(dirPath string) ([][]byte, error) {
+	if !lib.DirExists(dirPath) {
+		return nil, errors.New("dir is not exists")
+	}
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	//var filesContents []string
+	var fileBytes [][]byte
+	for _, file := range files {
+		byte, err := lib.Read(lib.CompletePath(dirPath, file.Name()))
+		if err != nil {
+			return nil, err
+		}
+		fileBytes = append(fileBytes, byte)
+	}
+	return fileBytes, nil
 }
 
 func AddOne(name string) error {

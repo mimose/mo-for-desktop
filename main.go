@@ -52,5 +52,6 @@ func main() {
 	//app.Bind(mo)
 	//app.Run()
 
-	group.AddOne("测试1")
+	group.ListAll()
+	//group.AddOne("测试")
 }
