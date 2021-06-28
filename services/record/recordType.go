@@ -1,6 +1,6 @@
 package record
 
 const (
-	Notice = 1
-	Note   = 2
+	Notice = iota
+	Note
 )

@@ -35,7 +35,7 @@ func (mo *Mo) WailsInit(runtime *wails.Runtime) error {
 
 // ================ group
 // list group
-func (mo *Mo) ListGroups() []group.Group {
+func (mo *Mo) ListGroups() group.GroupsList {
 	return group.ListAll()
 }
 
