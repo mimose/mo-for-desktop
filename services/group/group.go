@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mimose/gcosy/lib"
+	. "mo-for-desktop/model/group"
 	"mo-for-desktop/services/storage"
 	"sort"
 	"sync"
@@ -13,31 +14,15 @@ import (
 // local storage
 // ../group/group_[encode(key)]  ---- value: encode(Group)
 // ../group/recordRel/group_[encode(key) --- value: encode(List: record_local_storage_key)
-type Group struct {
-	Key        string    `json:key`
-	Name       string    `json:name`
-	CreateTime lib.CTime `json:createTime`
-	UpdateTime lib.CTime `json.updateTime`
-}
-
-type GroupsList []Group
-
-func (groups GroupsList) Len() int {
-	return len(groups)
-}
-
-func (groups GroupsList) Less(i, j int) bool {
-	return time.Time(groups[i].CreateTime).Before(time.Time(groups[j].CreateTime))
-}
-
-func (groups GroupsList) Swap(i, j int) {
-	groups[i], groups[j] = groups[j], groups[i]
-}
 
 var (
 	cipherKey     = "&dapIKE$dkIp1keP"
 	cipherBuilder *lib.CipherBuilder
 	cipherMutex   sync.Mutex
+)
+var (
+	allGroupsList      GroupsList
+	allGroupsListMutex sync.RWMutex
 )
 
 func getCipherBuilder() *lib.CipherBuilder {
@@ -54,6 +39,13 @@ func getCipherBuilder() *lib.CipherBuilder {
 }
 
 func ListAll() GroupsList {
+	if allGroupsList != nil {
+		return allGroupsList
+	}
+
+	allGroupsListMutex.Lock()
+	defer allGroupsListMutex.Unlock()
+
 	var groups GroupsList
 	groupDir := storage.LocalGroupDir()
 	bytes, err := lib.ReadDirAllFiles(groupDir)
@@ -81,8 +73,9 @@ func ListAll() GroupsList {
 	}
 	if len(groups) > 0 {
 		sort.Sort(groups)
+		allGroupsList = groups
 	}
-	return groups
+	return allGroupsList
 }
 
 func AddOne(name string) error {
@@ -112,5 +105,11 @@ func AddOne(name string) error {
 		// TODO log
 		fmt.Printf("[error] Group AdddOne. %s", err)
 	}
+
+	allGroupsListMutex.Lock()
+	defer allGroupsListMutex.Unlock()
+	allGroupsList = append(allGroupsList, group)
+	sort.Sort(allGroupsList)
+
 	return nil
 }

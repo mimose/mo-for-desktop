@@ -3,13 +3,14 @@ package group
 import (
 	"encoding/json"
 	"github.com/mimose/gcosy/lib"
+	. "mo-for-desktop/model/group"
 	"mo-for-desktop/services/storage"
 	"testing"
 	"time"
 )
 
 func TestAddOne(t *testing.T) {
-	err := AddOne("测试一下新增分组3")
+	err := AddOne("测试一下新增分组4")
 	if err != nil {
 		t.Errorf("error append, %s", err)
 	}
