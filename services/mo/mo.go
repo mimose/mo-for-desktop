@@ -3,8 +3,10 @@ package mo
 import (
 	"github.com/mimose/gcosy/lib"
 	"github.com/wailsapp/wails"
-	"mo-for-desktop/services/group"
+	. "mo-for-desktop/model/record"
+	. "mo-for-desktop/model/space"
 	"mo-for-desktop/services/record"
+	"mo-for-desktop/services/space"
 )
 
 type Mo struct {
@@ -33,17 +35,17 @@ func (mo *Mo) WailsInit(runtime *wails.Runtime) error {
 	return nil
 }
 
-// ================ group
-// list group
-func (mo *Mo) ListGroups() group.GroupsList {
-	return group.ListAll()
+// ================ space
+// list space
+func (mo *Mo) ListSpaces() SpacesList {
+	return space.ListAll()
 }
 
-// ================ group
+// ================ space
 
 // ================ record
-func (mo *Mo) ListRecord(groupKey, recordType int) []record.Record {
-	return record.Lists(groupKey, recordType)
+func (mo *Mo) ListRecord(spaceKey string, recordType int) RecordsList {
+	return record.Lists(spaceKey, recordType)
 }
 
 // ================ record

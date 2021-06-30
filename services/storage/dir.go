@@ -8,8 +8,8 @@ import (
 const localPath = "\\AppData\\Local\\mo"
 
 var localDir string
-var localGroupDir string
-var localGroupRecordRelDir string
+var localSpaceDir string
+var localSpaceRecordRelDir string
 var localRecordDir string
 
 func LocalDir() string {
@@ -24,16 +24,16 @@ func LocalDir() string {
 	return localDir
 }
 
-func LocalGroupDir() string {
-	if localGroupDir != "" {
-		return localGroupDir
+func LocalSpaceDir() string {
+	if localSpaceDir != "" {
+		return localSpaceDir
 	}
-	localGroupDir = strings.Join([]string{LocalDir(), "\\group"}, "")
-	return localGroupDir
+	localSpaceDir = strings.Join([]string{LocalDir(), "\\space"}, "")
+	return localSpaceDir
 }
 
-func LocalGroupDirByKey(key string) (string, string) {
-	return LocalGroupDir(), "\\" + key
+func LocalSpaceDirByKey(key string) (string, string) {
+	return LocalSpaceDir(), "\\" + key
 }
 
 func LocalRecordDir() string {
@@ -48,10 +48,10 @@ func LocalRecordDirByKey(key string) string {
 	return strings.Join([]string{LocalRecordDir(), key}, "\\")
 }
 
-func LocalGroupRecordRelDir() string {
-	if localGroupRecordRelDir != "" {
-		return localGroupRecordRelDir
+func LocalSpaceRecordRelDir() string {
+	if localSpaceRecordRelDir != "" {
+		return localSpaceRecordRelDir
 	}
-	localGroupRecordRelDir = strings.Join([]string{LocalGroupDir(), "\\recordRel"}, "")
-	return localGroupRecordRelDir
+	localSpaceRecordRelDir = strings.Join([]string{LocalSpaceDir(), "\\recordRel"}, "")
+	return localSpaceRecordRelDir
 }

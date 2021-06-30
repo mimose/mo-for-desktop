@@ -5,10 +5,10 @@ import (
 )
 
 // local storage
-// ../record/record_[encode(key)]  ---- value: encode(Record)
+// ../record/record_key  ---- value: Encrypted(Record)
 
-func Lists(groupKey, recordType int) RecordsList {
-	if groupKey == 0 && recordType == 0 {
+func Lists(spaceKey string, recordType int) RecordsList {
+	if spaceKey == "" && recordType == 0 {
 		return ListAll()
 	}
 	return nil

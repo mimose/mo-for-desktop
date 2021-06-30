@@ -8,6 +8,7 @@ import (
 type Record struct {
 	Key        string    `json:key`
 	Title      string    `json:title`
+	SpaceKey   string    `json:spaceKey`
 	RecordType int       `json:recordType`
 	Content    string    `json:content`
 	CoverPic   string    `json:coverPic`

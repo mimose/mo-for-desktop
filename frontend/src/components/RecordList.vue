@@ -1,7 +1,7 @@
 <template>
     <v-container fluid>
         <v-select
-            v-model="selectedGroup"
+            v-model="selectedSpace"
             class="pl-14"
             :items="items"
             item-text="name"
@@ -9,9 +9,9 @@
             chips
             solo
             deletable-chips
-            label="Choose one group"
+            label="Choose one space"
             no-data-text="default"
-            @change="clearSelectedGroup"
+            @change="clearSelectedSpace"
         ></v-select>
     </v-container>
 </template>
@@ -19,7 +19,7 @@
 <script>
 export default {
     data: () => ({
-        selectedGroup: '',
+        selectedSpace: '',
         items:[{
             key: 1,
             name: "first"
@@ -32,7 +32,7 @@ export default {
         },],
     }),
     methods: {
-        clearSelectedGroup() {
+        clearSelectedSpace() {
             
         }
     },
