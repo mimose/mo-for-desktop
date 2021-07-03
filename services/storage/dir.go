@@ -2,11 +2,11 @@ package storage
 
 import (
 	"os"
+	"runtime"
 	"strings"
 )
 
-const localPath = "/AppData/Local/mo"
-
+var localPath string
 var localDir string
 var localSpaceDir string
 var localSpaceRecordRelDir string
@@ -17,6 +17,11 @@ func LocalDir() string {
 		return localDir
 	}
 	homeDir, err := os.UserHomeDir()
+	if goos := runtime.GOOS; goos != "windows" {
+		localPath = "/.mo"
+	} else {
+		localPath = "/AppData/Local/mo"
+	}
 	if err != nil {
 		panic(err)
 	}
@@ -44,8 +49,8 @@ func LocalRecordDir() string {
 	return localRecordDir
 }
 
-func LocalRecordDirByKey(key string) string {
-	return strings.Join([]string{LocalRecordDir(), key}, "/")
+func LocalRecordDirByKey(key string) (string, string) {
+	return LocalRecordDir(), "/" + key
 }
 
 func LocalSpaceRecordRelDir() string {

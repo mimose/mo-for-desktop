@@ -60,14 +60,14 @@ func ListAll() SpacesList {
 		fmt.Printf("[info] Space ListAll. byte empty\n")
 		return spaces
 	}
-	spaces = make([]Space, 0, len(bytes))
+	spaces = make(SpacesList, 0, len(bytes))
 	for _, byte := range bytes {
 		var space Space
 		decrypted, err := getCipherBuilder().AesDecrypt(byte)
 		if err != nil {
 			// TODO log
 			fmt.Printf("[error] Space ListAll. %s\n", err)
-			return []Space{}
+			return SpacesList{}
 		}
 		json.Unmarshal(decrypted, &space)
 		spaces = append(spaces, space)
@@ -81,7 +81,7 @@ func ListAll() SpacesList {
 
 // 新增空间
 func AddOne(name string) error {
-	if err := uniqueSpaceName(name); err != NilError {
+	if err := uniqueSpaceName(name); err != nil {
 		// TODO log
 		fmt.Printf("[error] Space AddOne. uniqueSpaceName. %s\n", err.Error())
 		return err
@@ -96,15 +96,15 @@ func AddOne(name string) error {
 		UpdateTime: lib.CTime(now),
 	}
 
-	data, err := generateSpaceStorageData(space)
-	if err != NilError {
+	data, err := storage.GenerateToStorageData(space, *getCipherBuilder())
+	if err != nil {
 		// TODO log
 		fmt.Printf("[error] Space AddOne. generateSpaceStorageData. %s\n", err.Error())
 		return err
 	}
 
 	dirPath, fileName := storage.LocalSpaceDirByKey(key)
-	wErr := lib.Write(dirPath, fileName, data, false)
+	_, wErr := lib.Write(dirPath, fileName, data, false)
 	if wErr != nil {
 		// TODO log
 		fmt.Printf("[error] Space AdddOne. %s\n", wErr)
@@ -116,32 +116,21 @@ func AddOne(name string) error {
 	allSpacesList = append(allSpacesList, space)
 	sort.Sort(allSpacesList)
 
-	return NilError
+	return nil
 }
 
 // 空间名唯一判断
 func uniqueSpaceName(name string) error {
 	spaces := ListAll()
 	if spaces == nil {
-		return NilError
+		return nil
 	}
 	for _, space := range spaces {
 		if space.Name == name {
 			return lib.NewError(UniqueSpaceName, UniqueSpaceNameDesc, nil)
 		}
 	}
-	return NilError
+	return nil
 }
 
 // 生成空间内容存储字节流
-func generateSpaceStorageData(space Space) ([]byte, error) {
-	spaceJson, marshalErr := json.Marshal(space)
-	if marshalErr != nil {
-		return nil, lib.NewError(Marshal, MarshalDesc, marshalErr)
-	}
-	encrypted, encryptedErr := getCipherBuilder().AesEncrypt(spaceJson)
-	if encryptedErr != nil {
-		return nil, lib.NewError(Encrypt, EncryptDesc, encryptedErr)
-	}
-	return encrypted, NilError
-}

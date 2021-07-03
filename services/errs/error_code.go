@@ -1,12 +1,5 @@
 package errs
 
-import (
-	"github.com/mimose/gcosy/lib"
-)
-
-// 空异常对象
-var NilError = &lib.CError{}
-
 const (
 	UnknowVersion = iota
 	Marshal
@@ -33,4 +26,10 @@ const (
 	UniqueSpaceNameDesc          = "重复的空间名称"
 	GenerateSpaceStorageData     = 11002
 	GenerateSpaceStorageDataDesc = "空间数据转存储内容失败"
+)
+
+// record相关异常
+const (
+	AddRecordBodyError     = 21001
+	AddRecordValidateError = 21002
 )

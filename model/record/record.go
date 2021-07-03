@@ -2,6 +2,7 @@ package record
 
 import (
 	"github.com/mimose/gcosy/lib"
+	. "mo-for-desktop/services/errs"
 	"time"
 )
 
@@ -16,6 +17,19 @@ type Record struct {
 	UpdateTime lib.CTime `json.updateTime`
 }
 
+func (r Record) Validate() error {
+	if r.Title == "" {
+		return lib.NewError(AddRecordValidateError, "标题不可为空", nil)
+	}
+	if r.RecordType != Notice && r.RecordType != Note {
+		return lib.NewError(AddRecordValidateError, "未知的类型", nil)
+	}
+	if r.SpaceKey == "" {
+		return lib.NewError(AddRecordValidateError, "分组不可为空", nil)
+	}
+	return nil
+}
+
 type RecordsList []Record
 
 func (records RecordsList) Len() int {
@@ -28,4 +42,15 @@ func (records RecordsList) Less(i, j int) bool {
 
 func (records RecordsList) Swap(i, j int) {
 	records[i], records[j] = records[j], records[i]
+}
+
+func (records RecordsList) FilterRecordListByRecordType(recordType int) RecordsList {
+	index := 0
+	for _, record := range records {
+		if record.RecordType == recordType {
+			records[index] = record
+			index++
+		}
+	}
+	return records[:index]
 }
