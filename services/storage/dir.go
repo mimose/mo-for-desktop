@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const localPath = "\\AppData\\Local\\mo"
+const localPath = "/AppData/Local/mo"
 
 var localDir string
 var localSpaceDir string
@@ -28,30 +28,30 @@ func LocalSpaceDir() string {
 	if localSpaceDir != "" {
 		return localSpaceDir
 	}
-	localSpaceDir = strings.Join([]string{LocalDir(), "\\space"}, "")
+	localSpaceDir = strings.Join([]string{LocalDir(), "/space"}, "")
 	return localSpaceDir
 }
 
 func LocalSpaceDirByKey(key string) (string, string) {
-	return LocalSpaceDir(), "\\" + key
+	return LocalSpaceDir(), "/" + key
 }
 
 func LocalRecordDir() string {
 	if localRecordDir != "" {
 		return localRecordDir
 	}
-	localRecordDir = strings.Join([]string{LocalDir(), "\\record"}, "")
+	localRecordDir = strings.Join([]string{LocalDir(), "/record"}, "")
 	return localRecordDir
 }
 
 func LocalRecordDirByKey(key string) string {
-	return strings.Join([]string{LocalRecordDir(), key}, "\\")
+	return strings.Join([]string{LocalRecordDir(), key}, "/")
 }
 
 func LocalSpaceRecordRelDir() string {
 	if localSpaceRecordRelDir != "" {
 		return localSpaceRecordRelDir
 	}
-	localSpaceRecordRelDir = strings.Join([]string{LocalSpaceDir(), "\\recordRel"}, "")
+	localSpaceRecordRelDir = strings.Join([]string{LocalSpaceDir(), "/recordRel"}, "")
 	return localSpaceRecordRelDir
 }

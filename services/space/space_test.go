@@ -2,7 +2,9 @@ package space
 
 import (
 	"fmt"
+	"io/ioutil"
 	. "mo-for-desktop/services/errs"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -18,6 +20,25 @@ func TestAddOne(t *testing.T) {
 	if err != NilError {
 		t.Errorf("error append, %s", err.Error())
 	}
+}
+
+func TestFile(t *testing.T) {
+	dirPath := "/Users/mimose/AppData"
+	dir, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	err = os.RemoveAll(dirPath)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	for i, info := range dir {
+		fmt.Println(i, info)
+	}
+	//_, err = os.ReadDir(dirPath)
+	//if err != nil {
+	//	t.Errorf(err.Error())
+	//}
 }
 
 func TestListAll(t *testing.T) {
