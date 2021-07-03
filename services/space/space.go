@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mimose/gcosy/lib"
+	"mo-for-desktop/model/errs"
 	. "mo-for-desktop/model/space"
-	. "mo-for-desktop/services/errs"
 	"mo-for-desktop/services/storage"
 	"sort"
 	"sync"
@@ -108,7 +108,7 @@ func AddOne(name string) error {
 	if wErr != nil {
 		// TODO log
 		fmt.Printf("[error] Space AdddOne. %s\n", wErr)
-		return lib.NewError(WriteFile, WriteFileDesc, wErr)
+		return lib.NewError(errs.WriteFile, errs.WriteFileDesc, wErr)
 	}
 
 	allSpacesListMutex.Lock()
@@ -127,7 +127,7 @@ func uniqueSpaceName(name string) error {
 	}
 	for _, space := range spaces {
 		if space.Name == name {
-			return lib.NewError(UniqueSpaceName, UniqueSpaceNameDesc, nil)
+			return lib.NewError(errs.UniqueSpaceName, errs.UniqueSpaceNameDesc, nil)
 		}
 	}
 	return nil

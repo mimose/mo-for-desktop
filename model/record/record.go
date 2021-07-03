@@ -2,7 +2,7 @@ package record
 
 import (
 	"github.com/mimose/gcosy/lib"
-	. "mo-for-desktop/services/errs"
+	"mo-for-desktop/model/errs"
 	"time"
 )
 
@@ -19,13 +19,13 @@ type Record struct {
 
 func (r Record) Validate() error {
 	if r.Title == "" {
-		return lib.NewError(AddRecordValidateError, "标题不可为空", nil)
+		return lib.NewError(errs.AddRecordValidateError, "标题不可为空", nil)
 	}
 	if r.RecordType != Notice && r.RecordType != Note {
-		return lib.NewError(AddRecordValidateError, "未知的类型", nil)
+		return lib.NewError(errs.AddRecordValidateError, "未知的类型", nil)
 	}
 	if r.SpaceKey == "" {
-		return lib.NewError(AddRecordValidateError, "分组不可为空", nil)
+		return lib.NewError(errs.AddRecordValidateError, "分组不可为空", nil)
 	}
 	return nil
 }

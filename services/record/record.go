@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mimose/gcosy/lib"
+	"mo-for-desktop/model/errs"
 	. "mo-for-desktop/model/record"
-	. "mo-for-desktop/services/errs"
 	"mo-for-desktop/services/space_record_rel"
 	"mo-for-desktop/services/storage"
 	"sort"
@@ -153,7 +153,7 @@ func AddOne(body string) error {
 	if wErr != nil {
 		// TODO log
 		fmt.Printf("[error] Record AdddOne. %s\n", wErr)
-		return lib.NewError(WriteFile, WriteFileDesc, wErr)
+		return lib.NewError(errs.WriteFile, errs.WriteFileDesc, wErr)
 	}
 
 	// add the space_record_rel
@@ -177,24 +177,24 @@ func bodyToRecord(body string) (Record, error) {
 	if body == "" {
 		// TODO log
 		fmt.Printf("[error] Record AddOne. body empty\n")
-		return Record{}, lib.NewError(AddRecordBodyError, "转换前数据为空", nil)
+		return Record{}, lib.NewError(errs.AddRecordBodyError, "转换前数据为空", nil)
 	}
 	var record Record
 	err := json.Unmarshal([]byte(body), &record)
 	if err != nil {
 		// TODO log
 		fmt.Printf("[error] Record AddOne. to Struct fail. %s\n", err)
-		return Record{}, lib.NewError(AddRecordBodyError, "数据转换异常", err)
+		return Record{}, lib.NewError(errs.AddRecordBodyError, "数据转换异常", err)
 	}
 	if record == (Record{}) {
 		// TODO log
 		fmt.Printf("[error] Record AddOne. to Struct fail\n")
-		return Record{}, lib.NewError(AddRecordBodyError, "转换后数据为空", nil)
+		return Record{}, lib.NewError(errs.AddRecordBodyError, "转换后数据为空", nil)
 	}
 	if err = record.Validate(); err != nil {
 		// TODO log
 		fmt.Printf("[error] Record AddOne. record validate fail, %s\n", err)
-		return Record{}, lib.NewError(AddRecordBodyError, "转换后数据校验不通过", err)
+		return Record{}, lib.NewError(errs.AddRecordBodyError, "转换后数据校验不通过", err)
 	}
 	return record, nil
 }

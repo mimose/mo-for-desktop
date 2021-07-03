@@ -1,5 +1,12 @@
 <template>
     <v-app id="inspire">
+        <v-overlay z-index="999" :value="appOverlay">
+          <v-progress-circular
+            indeterminate 
+            size="64"
+          ></v-progress-circular> 
+        </v-overlay>
+
         <v-system-bar app 
           height="36"
           fixed
@@ -30,10 +37,9 @@
                 width="100%"
             ></v-sheet> -->
             
-            <record-list></record-list>
+            <record-list :appOverlaySync.sync='appOverlay'></record-list>
 
         </v-navigation-drawer>
-
 
     </v-app>
 </template>
@@ -50,6 +56,7 @@ export default {
   name: "mo-app",
   data: () => ({
     drawer: null,
+    appOverlay: false
   }),
   components: {
     moToolBar: MoToolBar,

@@ -31,9 +31,13 @@ export default {
             name: "three"
         },],
     }),
+    computed: {
+        
+    },
     methods: {
         clearSelectedSpace() {
-            
+            // 进行全局遮罩，在查询时进行
+            // this.$emit('update:appOverlaySync', true)
         }
     },
 };

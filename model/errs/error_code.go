@@ -1,7 +1,10 @@
 package errs
 
+const SuccessCode = 200
+
 const (
-	UnknowVersion = iota
+	UnknownVersion = iota
+	UnknownError
 	Marshal
 	Unmarshal
 	Encrypt
