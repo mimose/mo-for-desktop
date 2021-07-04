@@ -7,8 +7,12 @@
         :items="items"
         item-text="name"
         item-value="key"
+        :loading="spaceLoading? `primary` : `false`"
+        :disabled="spaceLoading"
         chips
         solo
+        dense
+        hide-selected
         deletable-chips
         label="选择你的空间"
         no-data-text="default"
@@ -17,8 +21,9 @@
     </div>
 
     <div
-      class="py-16 pr-3"
-      style="position: absolute; height: 90%; overflow: auto; z-index: 1"
+      v-if="recordGroup != null && recordGroup.length > 0"
+      class="py-13 pl-14 pr-6"
+      style="position: absolute;height: 90%; width:100%; overflow: auto; z-index: 1"
     >
       <!-- <v-text-field
       class="pl-14"
@@ -34,7 +39,7 @@
       </template>
     </v-text-field> -->
 
-      <h2 class="text-h5 success--text pl-14">
+      <h2 class="text-h6 success--text">
         Record:&nbsp;
         <v-fade-transition leave-absolute>
           <span :key="`records-${recordCount}`">
@@ -43,9 +48,9 @@
         </v-fade-transition>
       </h2>
 
-      <v-divider class="mt-4 ml-14"></v-divider>
+      <v-divider class="mt-1"></v-divider>
 
-      <v-row class="my-1 pl-14" align="center">
+      <v-row class="my-1" align="center">
         <strong class="mx-4 info--text text--darken-2">
           Remaining: {{ remainingRecordCount }}
         </strong>
@@ -64,9 +69,9 @@
         ></v-progress-circular>
       </v-row>
 
-      <v-divider class="mb-4 ml-14"></v-divider>
+      <v-divider class="mb-1"></v-divider>
 
-      <v-tabs class="pl-14" v-model="tabModel" centered fixed-tabs slider-color="accent darken-1">
+      <v-tabs v-model="tabModel" centered height=40 fixed-tabs slider-color="accent darken-1">
         <v-tab
           v-for="group in recordGroup"
           :key="group.groupKey"
@@ -76,14 +81,14 @@
         </v-tab>
       </v-tabs>
 
-      <v-tabs-items class="pl-14" style="background: none" v-model="tabModel">
+      <v-tabs-items style="background: none" v-model="tabModel">
         <v-tab-item
           v-for="group in recordGroup"
           :key="group.groupKey"
           :value="`tab-${group.groupKey}`"
         >
-          <v-card flat>
-            <v-card-actions>
+          <!-- <v-card flat> -->
+            <!-- <v-card-actions> -->
               <v-expansion-panels
                 v-if="group.groupValues.length > 0"
                 accordion
@@ -97,6 +102,7 @@
                   >
                     <v-expansion-panel-header disable-icon-rotate>
                       <v-checkbox
+                        dense
                         v-model="record.done"
                         @change="check(record)"
                         :color="(record.done && 'grey') || 'primary'"
@@ -112,10 +118,10 @@
                         </template>
                       </v-checkbox>
                       <template v-slot:actions>
-                        <v-icon v-if="record.done" color="success">
+                        <v-icon dense v-if="record.done" color="success">
                           mdi-check
                         </v-icon>
-                        <v-icon v-if="!record.done" color="primary"></v-icon>
+                        <v-icon dense v-if="!record.done" color="primary"></v-icon>
                       </template>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content eager>
@@ -127,8 +133,8 @@
                   </v-expansion-panel>
                 </template>
               </v-expansion-panels>
-            </v-card-actions>
-          </v-card>
+            <!-- </v-card-actions> -->
+          <!-- </v-card> -->
         </v-tab-item>
       </v-tabs-items>
 
@@ -162,6 +168,7 @@
 export default {
   data: () => ({
     selectedSpace: "",
+    spaceLoading: false,
     tabModel: "tab-notice",
     items: [
       {
