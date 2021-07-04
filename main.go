@@ -43,8 +43,8 @@ func main() {
 	}
 	// wails create
 	app := wails.CreateApp(&wails.AppConfig{
-		Width:     1050,
-		Height:    560,
+		Width:     400,
+		Height:    600,
 		Title:     "mo",
 		JS:        js,
 		CSS:       css,

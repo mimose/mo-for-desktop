@@ -2,7 +2,6 @@ package record
 
 import (
 	"fmt"
-	"github.com/mimose/gcosy/lib"
 	"testing"
 )
 
@@ -37,9 +36,8 @@ func TestRemoveOne(t *testing.T) {
 	}
 }
 
-func TestDeleteFile(t *testing.T) {
-	err := lib.DeleteFile("/Users/mimose/.mo/record/blWHOPLWuk")
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+func TestGroup(t *testing.T) {
+	all := ListAll()
+	group := all.Group()
+	t.Log(group)
 }
