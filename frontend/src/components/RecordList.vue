@@ -25,59 +25,22 @@
       class="py-13 pl-14 pr-6"
       style="position: absolute;height: 90%; width:100%; overflow: auto; z-index: 1"
     >
-      <!-- <v-text-field
-      class="pl-14"
-      v-model="newNoticeTask"
-      label="What are you working on?"
-      solo
-      @keydown.enter="create"
-    >
-      <template v-slot:append>
-        <v-fade-transition>
-          <v-icon v-if="newNoticeTask" @click="create"> add_circle </v-icon>
-        </v-fade-transition>
-      </template>
-    </v-text-field> -->
 
-      <h2 class="text-h6 success--text">
-        Record:&nbsp;
-        <v-fade-transition leave-absolute>
-          <span :key="`records-${recordCount}`">
-            {{ recordCount }}
-          </span>
-        </v-fade-transition>
-      </h2>
-
-      <v-divider class="mt-1"></v-divider>
-
-      <v-row class="my-1" align="center">
-        <strong class="mx-4 info--text text--darken-2">
-          Remaining: {{ remainingRecordCount }}
-        </strong>
-
-        <v-divider vertical></v-divider>
-
-        <strong class="mx-4 success--text text--darken-2">
-          Completed: {{ completedRecordCount }}
-        </strong>
-
-        <v-spacer></v-spacer>
-
-        <v-progress-circular
-          :value="progress"
-          class="mr-2"
-        ></v-progress-circular>
-      </v-row>
-
-      <v-divider class="mb-1"></v-divider>
-
-      <v-tabs v-model="tabModel" centered height=40 fixed-tabs slider-color="accent darken-1">
+      <v-tabs v-model="tabModel" centered height=50 fixed-tabs slider-color="accent darken-1">
         <v-tab
           v-for="group in recordGroup"
           :key="group.groupKey"
           :href="`#tab-${group.groupKey}`"
         >
           {{ group.groupName }}
+
+
+          <v-progress-circular
+            :value="progress(group.groupKey)"
+            class="ml-4"
+            size="20"
+            width="10"
+          ></v-progress-circular>
         </v-tab>
       </v-tabs>
 
@@ -100,12 +63,13 @@
                     :key="`${i}-${record.text}`"
                     :readonly="record.readonly"
                   >
-                    <v-expansion-panel-header disable-icon-rotate>
+                    <v-expansion-panel-header disable-icon-rotate style="padding: 5px 10px 0px 10px">
                       <v-checkbox
                         dense
                         v-model="record.done"
                         @change="check(record)"
                         :color="(record.done && 'grey') || 'primary'"
+                        style="max-width: 10%"
                       >
                         <template v-slot:label>
                           <span
@@ -145,11 +109,25 @@
       class="pl-14 pr-6"
       style="bottom: 5px; position: absolute; width: 100%; z-index: 2"
     >
-      <v-bottom-sheet v-model="sheet" persistent>
+      <v-bottom-sheet v-model="sheet" persistent eager>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn width="100%" color="accent darken-1" v-bind="attrs" v-on="on">
+          <!-- <v-btn width="100%" color="accent darken-1" v-bind="attrs" v-on="on">
             新建任务
-          </v-btn>
+          </v-btn> -->
+          <div class="text-center">
+            <v-btn
+              width="100%"
+              class="my-3"
+              color="accent darken-2"
+              v-bind="attrs" v-on="on"
+              text
+            >
+              <v-icon dark>
+                mdi-plus
+              </v-icon>
+              新建任务
+            </v-btn>
+          </div>
         </template>
         <v-sheet class="text-center" height="200px">
           <v-btn class="mt-6" text color="error" @click="sheet = !sheet">
@@ -236,24 +214,37 @@ export default {
     newNoticeTask: null,
     sheet: false,
   }),
+  watch: {
+    
+  },
   computed: {
     completedRecordCount() {
-      return (
-        this.recordGroup[0].groupValues.filter((task) => task.done).length +
-        this.recordGroup[1].groupValues.filter((task) => task.done).length
-      );
+      return function(groupKey) {
+        if(groupKey == 'notice') {
+          return this.recordGroup[0].groupValues.filter((task) => task.done).length;
+        } else {
+          return this.recordGroup[1].groupValues.filter((task) => task.done).length;
+        }
+      }
     },
     recordCount() {
-      return (
-        this.recordGroup[0].groupValues.length +
-        this.recordGroup[1].groupValues.length
-      );
-    },
-    progress() {
-      return (this.completedRecordCount / this.recordCount) * 100;
+      return function(groupKey) {
+        if(groupKey == 'notice') {
+          return this.recordGroup[0].groupValues.length;
+        } else {
+          return this.recordGroup[1].groupValues.length;
+        }
+      }
     },
     remainingRecordCount() {
-      return this.recordCount - this.completedRecordCount;
+      return function(groupKey) {
+        return this.recordCount(groupKey) - this.completedRecordCount(groupKey);
+      }
+    },
+    progress() {
+      return function(groupKey) {
+        return (this.completedRecordCount(groupKey) / this.recordCount(groupKey)) * 100;
+      }
     },
   },
   methods: {

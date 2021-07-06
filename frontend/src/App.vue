@@ -6,28 +6,15 @@
 
     <v-system-bar app height="36" fixed color="accent darken-4">
       <v-banner single-line @click:icon="goHomePage">
-        <!-- <v-icon
-              slot="icon"
-              color="warning"
-              size="25"
-            >mdi-wifi-strength-alert-outline</v-icon> -->
         <span style="color: white">built by mimose / mimosecy@gmail.com</span>
       </v-banner>
     </v-system-bar>
-    
+
     <v-main app>
       <moToolBar></moToolBar>
-
-      <!-- <v-sheet
-                color="grey lighten-5"
-                height="5%"
-                width="100%"
-            ></v-sheet> -->
-      
-    <!-- <div style="height: 70%;overflow: auto;"> -->
-    <div style="height: 80%;overflow: auto;">
-      <record-list :appOverlaySync.sync="appOverlay"></record-list>
-    </div>
+      <div style="height: 80%; overflow: auto">
+        <record-list :appOverlaySync.sync="appOverlay"></record-list>
+      </div>
     </v-main>
   </v-app>
 </template>
