@@ -4,7 +4,7 @@
       <v-select
         v-model="selectedSpace"
         class="pl-14 pr-6"
-        :items="items"
+        :items="spaces"
         item-text="name"
         item-value="key"
         :loading="spaceLoading? `primary` : `false`"
@@ -148,7 +148,7 @@ export default {
     selectedSpace: "",
     spaceLoading: false,
     tabModel: "tab-notice",
-    items: [
+    spaces: [
       {
         key: 1,
         name: "first",
@@ -214,9 +214,6 @@ export default {
     newNoticeTask: null,
     sheet: false,
   }),
-  watch: {
-    
-  },
   computed: {
     completedRecordCount() {
       return function(groupKey) {
@@ -247,7 +244,24 @@ export default {
       }
     },
   },
+  mounted: function() {
+    // 获取空间列表
+    this.loadSpaces();
+  },
   methods: {
+    /**
+     * 获取空间列表
+     */
+    loadSpaces: function() {
+      let vm = this;
+      vm.spaceLoading = true;
+      window.backend.Mo.ListSpaces().then(resp => {
+        if(resp.code === 300 && resp.data != null) {
+          vm.spaces = resp.data;
+        }
+        vm.spaceLoading = false;
+      });
+    },
     clearSelectedSpace() {
       // 进行全局遮罩，在查询时进行
       // this.$emit('update:appOverlaySync', true)

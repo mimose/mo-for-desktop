@@ -36,7 +36,7 @@ func (mo *Mo) WailsInit(runtime *wails.Runtime) error {
 
 // ================ space
 // 新增空间
-func (mo *Mo) NewSpace(name string) *RespInfo {
+func (mo *Mo) NewSpace(name string) RespInfo {
 	err := space.AddOne(name)
 	if err != nil {
 		return Error(err)
@@ -45,7 +45,7 @@ func (mo *Mo) NewSpace(name string) *RespInfo {
 }
 
 // 获取空间列表
-func (mo *Mo) ListSpaces() *RespInfo {
+func (mo *Mo) ListSpaces() RespInfo {
 	return Success(space.ListAll())
 }
 
@@ -53,7 +53,7 @@ func (mo *Mo) ListSpaces() *RespInfo {
 
 // ================ record
 // 新增记录
-func (mo *Mo) NewRecord(body string) *RespInfo {
+func (mo *Mo) NewRecord(body string) RespInfo {
 	err := record.AddOne(body)
 	if err != nil {
 		return Error(err)
@@ -62,7 +62,7 @@ func (mo *Mo) NewRecord(body string) *RespInfo {
 }
 
 // 删除记录
-func (mo *Mo) RemoveRecord(recordKey string) *RespInfo {
+func (mo *Mo) RemoveRecord(recordKey string) RespInfo {
 	err := record.RemoveOne(recordKey)
 	if err != nil {
 		return Error(err)
@@ -71,7 +71,7 @@ func (mo *Mo) RemoveRecord(recordKey string) *RespInfo {
 }
 
 // 获取记录列表
-func (mo *Mo) ListRecord(spaceKey string, recordType int) *RespInfo {
+func (mo *Mo) ListRecord(spaceKey string, recordType int) RespInfo {
 	return Success(record.Lists(spaceKey, recordType))
 }
 

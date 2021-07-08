@@ -57,6 +57,6 @@ func LocalSpaceRecordRelDir() string {
 	if localSpaceRecordRelDir != "" {
 		return localSpaceRecordRelDir
 	}
-	localSpaceRecordRelDir = strings.Join([]string{LocalSpaceDir(), "/recordRel"}, "")
+	localSpaceRecordRelDir = strings.Join([]string{LocalDir(), "/recordRel"}, "")
 	return localSpaceRecordRelDir
 }

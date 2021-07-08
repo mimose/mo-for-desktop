@@ -6,10 +6,10 @@ import (
 )
 
 type Space struct {
-	Key        string    `json:key`
-	Name       string    `json:name`
-	CreateTime lib.CTime `json:createTime`
-	UpdateTime lib.CTime `json.updateTime`
+	Key        string    `json:"key"`
+	Name       string    `json:"name"`
+	CreateTime lib.CTime `json:"createTime"`
+	UpdateTime lib.CTime `json:"updateTime"`
 }
 
 type SpacesList []Space

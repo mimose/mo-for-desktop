@@ -2,7 +2,6 @@ package space
 
 import (
 	"fmt"
-	. "mo-for-desktop/services/errs"
 	"strconv"
 	"strings"
 	"testing"
@@ -25,7 +24,7 @@ func TestListAll(t *testing.T) {
 	if spaces == nil || len(spaces) == 0 {
 		t.Error("empty space")
 	}
-	t.Fatalf("space detail: %s\n", spaces)
+	fmt.Printf("space detail: %s\n", spaces)
 }
 
 func TestAddAndList(t *testing.T) {

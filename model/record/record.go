@@ -7,15 +7,15 @@ import (
 )
 
 type Record struct {
-	Key        string    `json:key`
-	Title      string    `json:title`
-	SpaceKey   string    `json:spaceKey`
-	RecordType int       `json:recordType`
-	Content    string    `json:content`
-	NoticeTime lib.CTime `json:noticeTime`
-	CoverPic   string    `json:coverPic`
-	CreateTime lib.CTime `json:createTime`
-	UpdateTime lib.CTime `json.updateTime`
+	Key        string    `json:"key"`
+	Title      string    `json:"title"`
+	SpaceKey   string    `json:"spaceKey"`
+	RecordType int       `json:"recordType"`
+	Content    string    `json:"content"`
+	NoticeTime lib.CTime `json:"noticeTime"`
+	CoverPic   string    `json:"coverPic"`
+	CreateTime lib.CTime `json:"createTime"`
+	UpdateTime lib.CTime `json:"updateTime"`
 }
 
 func (r Record) Validate() error {
@@ -34,8 +34,8 @@ func (r Record) Validate() error {
 type RecordsList []Record
 
 type RecordsGroup struct {
-	NoticesList RecordsList `json:notices`
-	NotesList   RecordsList `json:notes`
+	NoticesList RecordsList `json:"notices"`
+	NotesList   RecordsList `json:"notes"`
 }
 
 // ======= 排序interface
