@@ -6,11 +6,18 @@ import (
 )
 
 func TestAddOne(t *testing.T) {
-	body := `{"title":"测试标题555","spaceKey":"pyqCJMRebP", "recordType":0, "content":"测试内容122122333456987654yvubhinjomk"}`
+	//body := `{"title":"测试标题1","spaceKey":"QBvSZiJupK", "recordType":0, "content":"测试一个Notice"}`
+	//err := AddOne(body)
+	//if err != nil {
+	//	t.Errorf(err.Error())
+	//}
+
+	body := `{"title":"测试标题2","spaceKey":"QBvSZiJupK", "recordType":1, "content":"测试一个Note"}`
 	err := AddOne(body)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+
 	file := ListAll()
 	for _, record := range file {
 		fmt.Println(record)

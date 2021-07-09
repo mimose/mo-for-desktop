@@ -4,6 +4,7 @@
       <v-select
         v-model="selectedSpace"
         class="pl-14 pr-6"
+        :menu-props="{bottom: true, offsetY: true}"
         :items="spaces"
         item-text="name"
         item-value="key"
@@ -12,11 +13,10 @@
         chips
         solo
         dense
-        hide-selected
         deletable-chips
         label="选择你的空间"
         no-data-text="default"
-        @change="clearSelectedSpace"
+        @change="changeSelectedSpace"
       ></v-select>
     </div>
 
@@ -60,7 +60,7 @@
               >
                 <template v-for="(record, i) in group.groupValues">
                   <v-expansion-panel
-                    :key="`${i}-${record.text}`"
+                    :key="`${i}-${record.key}`"
                     :readonly="record.readonly"
                   >
                     <v-expansion-panel-header disable-icon-rotate style="padding: 5px 10px 0px 10px">
@@ -69,7 +69,6 @@
                         v-model="record.done"
                         @change="check(record)"
                         :color="(record.done && 'grey') || 'primary'"
-                        style="max-width: 10%"
                       >
                         <template v-slot:label>
                           <span
@@ -77,7 +76,7 @@
                               (record.done && 'grey--text') || 'primary--text'
                             "
                             class="ml-4"
-                            v-text="record.text"
+                            v-text="record.title"
                           ></span>
                         </template>
                       </v-checkbox>
@@ -89,10 +88,7 @@
                       </template>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content eager>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                      ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                      {{record.content}}
                     </v-expansion-panel-content>
                   </v-expansion-panel>
                 </template>
@@ -148,67 +144,17 @@ export default {
     selectedSpace: "",
     spaceLoading: false,
     tabModel: "tab-notice",
-    spaces: [
-      {
-        key: 1,
-        name: "first",
-      },
-      {
-        key: 2,
-        name: "second",
-      },
-    ],
+    spaces: [],
     recordGroup: [
       {
         groupKey: "notice",
         groupName: "notice",
-        groupValues: [
-          {
-            done: false,
-            text: "Notice111",
-            readonly: true,
-          },
-          {
-            done: false,
-            text: "Notice222",
-            readonly: true,
-          },
-          {
-            done: false,
-            text: "Notice333",
-            readonly: true,
-          },
-        ],
+        groupValues: [],
       },
       {
         groupKey: "note",
         groupName: "note",
-        groupValues: [
-          {
-            done: false,
-            text: "Foobar",
-          },
-          {
-            done: false,
-            text: "Fizzbuzz",
-            readonly: false,
-          },
-          {
-            done: false,
-            text: "Abbbbbbb",
-            readonly: false,
-          },
-          {
-            done: false,
-            text: "Baaaaaaa",
-            readonly: false,
-          },
-          {
-            done: false,
-            text: "Cddddddd",
-            readonly: false,
-          },
-        ],
+        groupValues: [],
       },
     ],
     newNoticeTask: null,
@@ -256,15 +202,69 @@ export default {
       let vm = this;
       vm.spaceLoading = true;
       window.backend.Mo.ListSpaces().then(resp => {
-        if(resp.code === 300 && resp.data != null) {
+        if(resp.code === 200 && resp.data != null) {
           vm.spaces = resp.data;
+          vm.selectedSpace = vm.spaces[0].key
+          vm.changeSelectedSpace();
         }
         vm.spaceLoading = false;
       });
     },
-    clearSelectedSpace() {
+    async changeSelectedSpace() {
+      let vm = this;
       // 进行全局遮罩，在查询时进行
-      // this.$emit('update:appOverlaySync', true)
+      vm.$emit('update:appOverlaySync', true)
+      await vm.completeNoticeRecordGroup();
+      await vm.completeNoteRecordGroup();
+      vm.$emit('update:appOverlaySync', false)
+    },
+    async completeNoticeRecordGroup() {
+      let vm = this;
+      let noticesResp = await window.backend.Mo.ListRecord(vm.selectedSpace, 0);
+      if(noticesResp.code === 200) {
+        vm.recordGroup.forEach(item => {
+          if(item.groupKey === 'notice') {
+            item.groupValues = [];
+            if(noticesResp.data != null) {
+              noticesResp.data.forEach(element => {
+                let value = {
+                  key: element.key,
+                  done: false,
+                  title: element.title,
+                  content: element.content,
+                  readonly: element.content == null || element.content == ''
+                }
+                item.groupValues.push(value);
+              });
+            }
+            return;
+          }
+        });
+      }
+    },
+    async completeNoteRecordGroup() {
+      let vm = this;
+      let noteResp = await window.backend.Mo.ListRecord(vm.selectedSpace, 1);
+      if(noteResp.code === 200) {
+        vm.recordGroup.forEach(item => {
+          if(item.groupKey === 'note') {
+            item.groupValues = [];
+            if(noteResp.data != null) {
+              noteResp.data.forEach(element => {
+                let value = {
+                  key: element.key,
+                  done: false,
+                  title: element.title,
+                  content: element.content,
+                  readonly: element.content == null || element.content == ''
+                }
+                item.groupValues.push(value);
+              });
+            }
+            return;
+          }
+        });
+      }
     },
     create() {
       this.recordGroup[0].groupValues.push({
