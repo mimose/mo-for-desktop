@@ -1,7 +1,22 @@
 <template>
   <v-container fluid>
     <div style="position: absolute; width: 100%; z-index: 2">
-      <v-select
+      <v-autocomplete
+        v-model="selectedSpace"
+        class="pl-14 pr-6"
+        :items="spaces"
+        item-text="name"
+        item-value="key"
+        :loading="spaceLoading? `primary` : `false`"
+        :disabled="spaceLoading"
+        chips
+        solo
+        dense
+        deletable-chips
+        label="选择你的空间"
+        @change="changeSelectedSpace"
+      ></v-autocomplete>
+      <!-- <v-select
         v-model="selectedSpace"
         class="pl-14 pr-6"
         :menu-props="{bottom: true, offsetY: true}"
@@ -17,7 +32,7 @@
         label="选择你的空间"
         no-data-text="default"
         @change="changeSelectedSpace"
-      ></v-select>
+      ></v-select> -->
     </div>
 
     <div
@@ -64,22 +79,21 @@
                     :readonly="record.readonly"
                   >
                     <v-expansion-panel-header disable-icon-rotate style="padding: 5px 10px 0px 10px">
-                      <v-checkbox
+                      <v-switch
                         dense
+                        inset
                         v-model="record.done"
                         @change="check(record)"
-                        :color="(record.done && 'grey') || 'primary'"
+                        style="max-width: 10%"
                       >
-                        <template v-slot:label>
-                          <span
-                            :class="
-                              (record.done && 'grey--text') || 'primary--text'
-                            "
-                            class="ml-4"
-                            v-text="record.title"
-                          ></span>
-                        </template>
-                      </v-checkbox>
+                      </v-switch>
+                      <span
+                        :class="
+                          (record.done && 'grey--text') || 'primary--text'
+                        "
+                        class="ml-4"
+                        v-text="record.title"
+                      ></span>
                       <template v-slot:actions>
                         <v-icon dense v-if="record.done" color="success">
                           mdi-check
@@ -130,7 +144,7 @@
             close
           </v-btn>
           <div class="py-3">
-            This is a bottom sheet using the persistent prop
+            
           </div>
         </v-sheet>
       </v-bottom-sheet>
@@ -214,56 +228,35 @@ export default {
       let vm = this;
       // 进行全局遮罩，在查询时进行
       vm.$emit('update:appOverlaySync', true)
-      await vm.completeNoticeRecordGroup();
-      await vm.completeNoteRecordGroup();
+      await vm.completeRecordGroup('notice', 0);
+      await vm.completeRecordGroup('note', 1);
       vm.$emit('update:appOverlaySync', false)
     },
-    async completeNoticeRecordGroup() {
+    async completeRecordGroup(groupKey, recordKey) {
       let vm = this;
-      let noticesResp = await window.backend.Mo.ListRecord(vm.selectedSpace, 0);
-      if(noticesResp.code === 200) {
-        vm.recordGroup.forEach(item => {
-          if(item.groupKey === 'notice') {
-            item.groupValues = [];
-            if(noticesResp.data != null) {
-              noticesResp.data.forEach(element => {
-                let value = {
-                  key: element.key,
-                  done: false,
-                  title: element.title,
-                  content: element.content,
-                  readonly: element.content == null || element.content == ''
-                }
-                item.groupValues.push(value);
-              });
-            }
-            return;
-          }
-        });
+      let noticeRecordGroup = vm.recordGroup.find(item => item.groupKey === groupKey);
+      if(noticeRecordGroup == null) {
+        return;
       }
-    },
-    async completeNoteRecordGroup() {
-      let vm = this;
-      let noteResp = await window.backend.Mo.ListRecord(vm.selectedSpace, 1);
-      if(noteResp.code === 200) {
-        vm.recordGroup.forEach(item => {
-          if(item.groupKey === 'note') {
-            item.groupValues = [];
-            if(noteResp.data != null) {
-              noteResp.data.forEach(element => {
-                let value = {
-                  key: element.key,
-                  done: false,
-                  title: element.title,
-                  content: element.content,
-                  readonly: element.content == null || element.content == ''
-                }
-                item.groupValues.push(value);
-              });
+      noticeRecordGroup.groupValues = [];
+      if(vm.selectedSpace === '' || vm.selectedSpace === null) {
+        return;
+      }
+      let noticesResp = await window.backend.Mo.ListRecord(vm.selectedSpace, recordKey);
+      if(noticesResp.code === 200) {
+        if(noticesResp.data != null) {
+          noticesResp.data.forEach(element => {
+            console.log(element)
+            let value = {
+              key: element.key,
+              done: element.done,
+              title: element.title,
+              content: element.content,
+              readonly: element.content == null || element.content == ''
             }
-            return;
-          }
-        });
+            noticeRecordGroup.groupValues.push(value);
+          });
+        }
       }
     },
     create() {

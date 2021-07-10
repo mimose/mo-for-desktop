@@ -6,13 +6,8 @@ import (
 )
 
 func TestAddOne(t *testing.T) {
-	//body := `{"title":"测试标题1","spaceKey":"QBvSZiJupK", "recordType":0, "content":"测试一个Notice"}`
-	//err := AddOne(body)
-	//if err != nil {
-	//	t.Errorf(err.Error())
-	//}
-
-	body := `{"title":"测试标题2","spaceKey":"QBvSZiJupK", "recordType":1, "content":"测试一个Note"}`
+	body := `{"title":"测试标题4","spaceKey":"QBvSZiJupK", "recordType":0, "content":"测试一个Notice", "noticeTime":"2021-07-10 10:00:01", "done": true}`
+	//body := `{"title":"测试标题2","spaceKey":"QBvSZiJupK", "recordType":1, "content":"测试一个Note"， "done": true}`
 	err := AddOne(body)
 	if err != nil {
 		t.Errorf(err.Error())

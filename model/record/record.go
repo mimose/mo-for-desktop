@@ -14,6 +14,7 @@ type Record struct {
 	Content    string    `json:"content"`
 	NoticeTime lib.CTime `json:"noticeTime"`
 	CoverPic   string    `json:"coverPic"`
+	Done       bool      `json:"done"`
 	CreateTime lib.CTime `json:"createTime"`
 	UpdateTime lib.CTime `json:"updateTime"`
 }
