@@ -5,7 +5,6 @@ import (
 	"github.com/wailsapp/wails"
 	. "mo-for-desktop/model/resp_info"
 	"mo-for-desktop/services/record"
-	"mo-for-desktop/services/space"
 )
 
 type Mo struct {
@@ -34,23 +33,6 @@ func (mo *Mo) WailsInit(runtime *wails.Runtime) error {
 	return nil
 }
 
-// ================ space
-// 新增空间
-func (mo *Mo) NewSpace(name string) RespInfo {
-	err := space.AddOne(name)
-	if err != nil {
-		return Error(err)
-	}
-	return Success(nil)
-}
-
-// 获取空间列表
-func (mo *Mo) ListSpaces() RespInfo {
-	return Success(space.ListAll())
-}
-
-// ================ space
-
 // ================ record
 // 新增记录
 func (mo *Mo) NewRecord(body string) RespInfo {
@@ -71,8 +53,8 @@ func (mo *Mo) RemoveRecord(recordKey string) RespInfo {
 }
 
 // 获取记录列表
-func (mo *Mo) ListRecord(spaceKey string, recordType int) RespInfo {
-	return Success(record.Lists(spaceKey, recordType))
+func (mo *Mo) ListRecord(recordType int) RespInfo {
+	return Success(record.Lists(recordType))
 }
 
 // ================ record

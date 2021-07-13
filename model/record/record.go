@@ -9,7 +9,6 @@ import (
 type Record struct {
 	Key        string    `json:"key"`
 	Title      string    `json:"title"`
-	SpaceKey   string    `json:"spaceKey"`
 	RecordType int       `json:"recordType"`
 	Content    string    `json:"content"`
 	NoticeTime lib.CTime `json:"noticeTime"`
@@ -25,9 +24,6 @@ func (r Record) Validate() error {
 	}
 	if r.Title == "" {
 		return lib.NewError(errs.AddRecordValidateError, "主题不可为空", nil)
-	}
-	if r.SpaceKey == "" {
-		return lib.NewError(errs.AddRecordValidateError, "分组不可为空", nil)
 	}
 	return nil
 }

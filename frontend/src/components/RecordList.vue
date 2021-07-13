@@ -1,43 +1,8 @@
 <template>
   <v-container fluid>
-    <div style="position: absolute; width: 100%; z-index: 2">
-      <v-autocomplete
-        v-model="selectedSpace"
-        class="pl-14 pr-6"
-        :items="spaces"
-        item-text="name"
-        item-value="key"
-        :loading="spaceLoading? `primary` : `false`"
-        :disabled="spaceLoading"
-        chips
-        solo
-        dense
-        deletable-chips
-        label="选择你的空间"
-        @change="changeSelectedSpace"
-      ></v-autocomplete>
-      <!-- <v-select
-        v-model="selectedSpace"
-        class="pl-14 pr-6"
-        :menu-props="{bottom: true, offsetY: true}"
-        :items="spaces"
-        item-text="name"
-        item-value="key"
-        :loading="spaceLoading? `primary` : `false`"
-        :disabled="spaceLoading"
-        chips
-        solo
-        dense
-        deletable-chips
-        label="选择你的空间"
-        no-data-text="default"
-        @change="changeSelectedSpace"
-      ></v-select> -->
-    </div>
-
     <div
       v-if="recordGroup != null && recordGroup.length > 0"
-      class="py-13 pl-14 pr-6"
+      class="pl-14 pr-6"
       style="position: absolute;height: 90%; width:100%; overflow: auto; z-index: 1"
     >
 
@@ -79,14 +44,12 @@
                     :readonly="record.readonly"
                   >
                     <v-expansion-panel-header disable-icon-rotate style="padding: 5px 10px 0px 10px">
-                      <v-switch
-                        dense
-                        inset
+                      <v-checkbox
                         v-model="record.done"
                         @change="check(record)"
-                        style="max-width: 10%"
-                      >
-                      </v-switch>
+                        :color="(record.done && 'grey') || 'primary'"
+                        style="max-width: 5%"
+                      ></v-checkbox>
                       <span
                         :class="
                           (record.done && 'grey--text') || 'primary--text'
@@ -102,7 +65,12 @@
                       </template>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content eager>
-                      {{record.content}}
+                      <v-card elevation="0" flat >
+                        <v-card-text class="pb-0">
+                          <div v-if="record.noticeTime"><span>notice me at</span>&nbsp;&nbsp;{{record.noticeTime}}</div>
+                        </v-card-text>
+                        <v-card-text class="pt-0 pb-0 text--primary" v-text="record.content"></v-card-text>
+                      </v-card>
                     </v-expansion-panel-content>
                   </v-expansion-panel>
                 </template>
@@ -155,19 +123,12 @@
 <script>
 export default {
   data: () => ({
-    selectedSpace: "",
-    spaceLoading: false,
     tabModel: "tab-notice",
     spaces: [],
     recordGroup: [
       {
         groupKey: "notice",
         groupName: "notice",
-        groupValues: [],
-      },
-      {
-        groupKey: "note",
-        groupName: "note",
         groupValues: [],
       },
     ],
@@ -205,26 +166,10 @@ export default {
     },
   },
   mounted: function() {
-    // 获取空间列表
-    this.loadSpaces();
+    this.initWindow()
   },
   methods: {
-    /**
-     * 获取空间列表
-     */
-    loadSpaces: function() {
-      let vm = this;
-      vm.spaceLoading = true;
-      window.backend.Mo.ListSpaces().then(resp => {
-        if(resp.code === 200 && resp.data != null) {
-          vm.spaces = resp.data;
-          vm.selectedSpace = vm.spaces[0].key
-          vm.changeSelectedSpace();
-        }
-        vm.spaceLoading = false;
-      });
-    },
-    async changeSelectedSpace() {
+    async initWindow() {
       let vm = this;
       // 进行全局遮罩，在查询时进行
       vm.$emit('update:appOverlaySync', true)
@@ -242,7 +187,7 @@ export default {
       if(vm.selectedSpace === '' || vm.selectedSpace === null) {
         return;
       }
-      let noticesResp = await window.backend.Mo.ListRecord(vm.selectedSpace, recordKey);
+      let noticesResp = await window.backend.Mo.ListRecord(recordKey);
       if(noticesResp.code === 200) {
         if(noticesResp.data != null) {
           noticesResp.data.forEach(element => {
@@ -252,6 +197,7 @@ export default {
               done: element.done,
               title: element.title,
               content: element.content,
+              noticeTime: element.noticeTime,
               readonly: element.content == null || element.content == ''
             }
             noticeRecordGroup.groupValues.push(value);
@@ -260,6 +206,10 @@ export default {
       }
     },
     create() {
+      let vm = this;
+      // 进行全局遮罩，在查询时进行
+      vm.$emit('update:appOverlaySync', true)
+
       this.recordGroup[0].groupValues.push({
         done: false,
         text: this.newNoticeTask,
