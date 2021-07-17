@@ -43,3 +43,49 @@ func TestGroup(t *testing.T) {
 	group := all.Group()
 	t.Log(group)
 }
+
+func TestDoneOne(t *testing.T) {
+	var recordKey = "BmMbSOZxoQ"
+	record, fileFullPath, err := getOne(recordKey)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	fmt.Printf("record path: %s\n", fileFullPath)
+	fmt.Println(record)
+
+	err = DoneOne(recordKey)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	record, fileFullPath, err = getOne(recordKey)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	fmt.Printf("record path: %s\n", fileFullPath)
+	fmt.Println(record)
+
+}
+
+func TestUndoneOne(t *testing.T) {
+	var recordKey = "BmMbSOZxoQ"
+	record, fileFullPath, err := getOne(recordKey)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	fmt.Printf("record path: %s\n", fileFullPath)
+	fmt.Println(record)
+
+	err = UndoneOne(recordKey)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	record, fileFullPath, err = getOne(recordKey)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	fmt.Printf("record path: %s\n", fileFullPath)
+	fmt.Println(record)
+
+}

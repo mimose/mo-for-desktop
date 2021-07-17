@@ -121,6 +121,7 @@
 </template>
 
 <script>
+// const notifier = require('node-notifier')
 export default {
   data: () => ({
     tabModel: "tab-notice",
@@ -205,6 +206,21 @@ export default {
         }
       }
     },
+    async check(record) {
+      let vm = this;
+      let resp;
+      vm.$emit('update:appOverlaySync', true);
+      if(record.done) {
+        // 设置为完成
+        resp = await window.backend.Mo.DoneRecord(record.key);
+      } else {
+        resp = await window.backend.Mo.UndoneRecord(record.key);
+      }
+      if(resp.code !== 200) {
+        record.done = !record.done;
+      }
+      vm.$emit('update:appOverlaySync', false);
+    },
     create() {
       let vm = this;
       // 进行全局遮罩，在查询时进行
@@ -217,9 +233,17 @@ export default {
 
       this.newNoticeTask = null;
     },
-    check(record) {
-        console.log(record)
-    }
+    // testNotice() {
+      // debugger;
+      // String
+      // notifier.notify('Message');
+      // Object
+      // notifier.notify({
+      //   'title': 'My notification',
+      //   'message': 'Hello, there!'
+      // });
+
+    // }
   },
 };
 </script>

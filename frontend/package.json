@@ -12,12 +12,14 @@
     "@wailsapp/runtime": "^1.0.10",
     "core-js": "^3.6.4",
     "material-design-icons-iconfont": "^4.0.5",
+    "node-notifier": "^10.0.0",
     "regenerator-runtime": "^0.13.3",
     "vue": "^2.6.11",
     "vuetify": "^2.5.5",
     "vuex": "^3.1.0"
   },
   "devDependencies": {
+    "@types/node-notifier": "^8.0.1",
     "@vue/cli-plugin-babel": "^4.2.3",
     "@vue/cli-plugin-eslint": "^4.2.3",
     "@vue/cli-service": "^4.2.3",
@@ -37,7 +39,10 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "rules": {
+      "no-debugger": "off",
+      "no-console": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }

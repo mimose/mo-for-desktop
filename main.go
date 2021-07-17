@@ -48,7 +48,7 @@ func main() {
 		Title:     "mo",
 		JS:        js,
 		CSS:       css,
-		Colour:    "#131313",
+		Colour:    "#fff",
 		Resizable: true,
 	})
 	app.Bind(mo)

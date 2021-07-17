@@ -109,22 +109,7 @@ func AddOne(body string) error {
 	record.CreateTime = lib.CTime(now)
 	record.UpdateTime = lib.CTime(now)
 
-	data, err := storage.GenerateToStorageData(record, *getCipherBuilder())
-	if err != nil {
-		// TODO log
-		fmt.Printf("[error] Record AddOne. generateRecordStorageData. %s\n", err.Error())
-		return err
-	}
-
-	dirPath, fileName := storage.LocalRecordDirByKey(key)
-	_, wErr := lib.Write(dirPath, fileName, data, false)
-	if wErr != nil {
-		// TODO log
-		fmt.Printf("[error] Record AdddOne. %s\n", wErr)
-		return lib.NewError(errs.WriteFile, errs.WriteFileDesc, wErr)
-	}
-
-	return nil
+	return newOrUpdateOne(record)
 }
 
 func bodyToRecord(body string) (Record, error) {
@@ -167,5 +152,53 @@ func RemoveOne(recordKey string) error {
 		fmt.Printf("[error] Record RemoveOne. recordKey, %s, err: %s\n", recordKey, err)
 		panic(err)
 	}
+	return nil
+}
+
+// 完成一条记录
+func DoneOne(recordKey string) error {
+	record, _, err := getOne(recordKey)
+	if err != nil {
+		// TODO log
+		fmt.Printf("[error] Record DoneONe. recordKey: %s, err: %s\n", recordKey, err)
+		return err
+	}
+	record.Done = true
+	record.UpdateTime = lib.CTime(time.Now())
+
+	return newOrUpdateOne(record)
+}
+
+// 重设一条记录
+func UndoneOne(recordKey string) error {
+	record, _, err := getOne(recordKey)
+	if err != nil {
+		// TODO log
+		fmt.Printf("[error] Record UndoneOne. recordKey: %s, err: %s\n", recordKey, err)
+		return err
+	}
+	record.Done = false
+	record.UpdateTime = lib.CTime(time.Now())
+
+	return newOrUpdateOne(record)
+}
+
+// 新增或更新
+func newOrUpdateOne(record Record) error {
+	data, err := storage.GenerateToStorageData(record, *getCipherBuilder())
+	if err != nil {
+		// TODO log
+		fmt.Printf("[error] Record newOrUpdateOne. generateRecordStorageData. %s\n", err.Error())
+		return err
+	}
+
+	dirPath, fileName := storage.LocalRecordDirByKey(record.Key)
+	_, wErr := lib.Write(dirPath, fileName, data, false)
+	if wErr != nil {
+		// TODO log
+		fmt.Printf("[error] Record newOrUpdateOne. %s\n", wErr)
+		return lib.NewError(errs.WriteFile, errs.WriteFileDesc, wErr)
+	}
+
 	return nil
 }

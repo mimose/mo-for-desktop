@@ -12,6 +12,10 @@ Vue.use(Vuetify, {
 
 export default new Vuetify({})
 
+Vue.config.errorHandler = function(err, vm, info) {
+  console.log(`Error: ${err.toString()}\nInfo: ${info}`);
+}
+
 // Vuex!
 import Vuex from 'vuex'
 Vue.use(Vuex)

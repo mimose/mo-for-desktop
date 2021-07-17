@@ -57,4 +57,22 @@ func (mo *Mo) ListRecord(recordType int) RespInfo {
 	return Success(record.Lists(recordType))
 }
 
+// 完成一条记录
+func (mo *Mo) DoneRecord(recordKey string) RespInfo {
+	err := record.DoneOne(recordKey)
+	if err != nil {
+		return Error(err)
+	}
+	return Success(nil)
+}
+
+// 重设一条记录
+func (mo *Mo) UndoneRecord(recordKey string) RespInfo {
+	err := record.UndoneOne(recordKey)
+	if err != nil {
+		return Error(err)
+	}
+	return Success(nil)
+}
+
 // ================ record
