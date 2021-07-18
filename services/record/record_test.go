@@ -8,7 +8,7 @@ import (
 func TestAddOne(t *testing.T) {
 	body := `{"title":"测试标题4", "recordType":0, "content":"测试一个Notice", "noticeTime":"2021-07-10 10:00:01", "done": false}`
 	//body := `{"title":"测试标题2","spaceKey":"QBvSZiJupK", "recordType":1, "content":"测试一个Note"， "done": true}`
-	err := AddOne(body)
+	err := AddOrUpdateOne(body)
 	if err != nil {
 		t.Errorf(err.Error())
 	}

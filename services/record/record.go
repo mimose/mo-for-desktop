@@ -97,16 +97,18 @@ func getOne(recordKey string) (Record, string, error) {
 }
 
 // 新增记录
-func AddOne(body string) error {
+func AddOrUpdateOne(body string) error {
 	record, err := bodyToRecord(body)
 	if err != nil {
 		return err
 	}
 
 	now := time.Now()
-	key := storage.RandStringBytesMaskImprSrcUnsafe()
-	record.Key = key
-	record.CreateTime = lib.CTime(now)
+	if len(record.Key) == 0 {
+		key := storage.RandStringBytesMaskImprSrcUnsafe()
+		record.Key = key
+		record.CreateTime = lib.CTime(now)
+	}
 	record.UpdateTime = lib.CTime(now)
 
 	return newOrUpdateOne(record)
@@ -115,24 +117,24 @@ func AddOne(body string) error {
 func bodyToRecord(body string) (Record, error) {
 	if body == "" {
 		// TODO log
-		fmt.Printf("[error] Record AddOne. body empty\n")
+		fmt.Printf("[error] Record AddOrUpdateOne. body empty\n")
 		return Record{}, lib.NewError(errs.AddRecordBodyError, "转换前数据为空", nil)
 	}
 	var record Record
 	err := json.Unmarshal([]byte(body), &record)
 	if err != nil {
 		// TODO log
-		fmt.Printf("[error] Record AddOne. to Struct fail. %s\n", err)
+		fmt.Printf("[error] Record AddOrUpdateOne. to Struct fail. %s\n", err)
 		return Record{}, lib.NewError(errs.AddRecordBodyError, "数据转换异常", err)
 	}
 	if record == (Record{}) {
 		// TODO log
-		fmt.Printf("[error] Record AddOne. to Struct fail\n")
+		fmt.Printf("[error] Record AddOrUpdateOne. to Struct fail\n")
 		return Record{}, lib.NewError(errs.AddRecordBodyError, "转换后数据为空", nil)
 	}
 	if err = record.Validate(); err != nil {
 		// TODO log
-		fmt.Printf("[error] Record AddOne. record validate fail, %s\n", err)
+		fmt.Printf("[error] Record AddOrUpdateOne. record validate fail, %s\n", err)
 		return Record{}, lib.NewError(errs.AddRecordBodyError, "转换后数据校验不通过", err)
 	}
 	return record, nil

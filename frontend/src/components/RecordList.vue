@@ -11,6 +11,7 @@
           v-for="group in recordGroup"
           :key="group.groupKey"
           :href="`#tab-${group.groupKey}`"
+          @click="triggerExpand(group.groupKey)"
         >
           {{ group.groupName }}
 
@@ -37,6 +38,7 @@
                 accordion
                 multiple
                 focusable
+                :value="expands"
               >
                 <template v-for="(record, i) in group.groupValues">
                   <v-expansion-panel
@@ -70,6 +72,20 @@
                           <div v-if="record.noticeTime"><span>notice me at</span>&nbsp;&nbsp;{{record.noticeTime}}</div>
                         </v-card-text>
                         <v-card-text class="pt-0 pb-0 text--primary" v-text="record.content"></v-card-text>
+                        <v-card-actions class="pt-0 pb-0">
+                          <v-btn
+                            text
+                            plain
+                            right
+                            fixed
+                            color="teal accent-4"
+                            @click="openEditRecord(record)"
+                          >
+                          <v-icon dark small>
+                            mdi-pencil
+                          </v-icon>
+                          </v-btn>
+                        </v-card-actions>
                       </v-card>
                     </v-expansion-panel-content>
                   </v-expansion-panel>
@@ -87,7 +103,7 @@
       class="pl-14 pr-6"
       style="bottom: 5px; position: absolute; width: 100%; z-index: 2"
     >
-      <v-bottom-sheet v-model="sheet" persistent eager>
+      <v-bottom-sheet v-model="editWindow" persistent eager>
         <template v-slot:activator="{ on, attrs }">
           <!-- <v-btn width="100%" color="accent darken-1" v-bind="attrs" v-on="on">
             新建任务
@@ -98,6 +114,7 @@
               class="my-3"
               color="accent darken-2"
               v-bind="attrs" v-on="on"
+              @click="openCreateRecord"
               text
             >
               <v-icon dark>
@@ -107,13 +124,123 @@
             </v-btn>
           </div>
         </template>
-        <v-sheet class="text-center" height="200px">
-          <v-btn class="mt-6" text color="error" @click="sheet = !sheet">
+        <v-sheet class="text-center" min-height="420px">
+          <v-card 
+            :loading="editLoading?`primary`:`none`"
+            class="mx-auto"
+            elevation="0" 
+            flat
+          >
+          <v-form
+            ref="editWindowRef">
+            <v-card-text class="pl-14 pr-14">
+              <v-alert
+                dense
+                outlined
+                type="error"
+                :value="editErrorMessageShow">
+              {{editErrorMessage}}
+              </v-alert>
+              <v-text-field 
+                :disabled="editLoading" 
+                v-model="editRecord.title" 
+                counter
+                label="主题" 
+                :rules="titleRules" 
+                hide-details="auto"></v-text-field>
+              <v-textarea 
+                :disabled="editLoading" 
+                v-model="editRecord.content" 
+                counter
+                no-resize
+                rows="1"
+                :rules="contentRules"
+                label="详细内容" 
+                hide-details="auto"></v-textarea>
+              <v-dialog
+                ref="noticeDateDialog"
+                v-model="pickDateModal"
+                :return-value.sync="editRecord.noticeDate"
+                persistent>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    :disabled="editLoading"
+                    v-model="editRecord.noticeDate"
+                    label="提示日期"
+                    append-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="editRecord.noticeDate"
+                  :show-current="editRecord.noticeDate === ''"
+                  type="date"
+                  scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="pickDateModal = false;editRecord.noticeDate='';$refs.noticeDateDialog.save(editRecord.noticeDate)">
+                    清除
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.noticeDateDialog.save(editRecord.noticeDate)">
+                    保存
+                  </v-btn>
+                </v-date-picker>
+              </v-dialog>
+
+              <v-dialog
+                ref="noticeDateTimeDialog"
+                v-model="pickDateTimeModal"
+                :return-value.sync="editRecord.noticeDateTime"
+                persistent>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    :disabled="editLoading"
+                    v-model="editRecord.noticeDateTime"
+                    label="提示时间"
+                    append-icon="mdi-calendar"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-time-picker
+                  v-model="editRecord.noticeDateTime"
+                  :show-current="editRecord.noticeDateTime === ''"
+                  use-seconds
+                  format="24hr"
+                  scrollable>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="pickDateTimeModal = false;editRecord.noticeDateTime='';$refs.noticeDateTimeDialog.save(editRecord.noticeDateTime)">
+                    清除
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.noticeDateTimeDialog.save(editRecord.noticeDateTime)">
+                    保存
+                  </v-btn>
+                </v-time-picker>
+              </v-dialog>
+            </v-card-text>
+          </v-form>
+          </v-card>
+          <!-- <v-divider class="mx-4"></v-divider> -->
+          <v-btn :disabled="editLoading" class="mt-1 pl-14" text left fixed color="primary" @click="saveRecord">
+            save
+          </v-btn>
+          <v-btn :disabled="editLoading" class="mt-1 pr-14" text right fixed color="accent" @click="editWindow = !editWindow">
             close
           </v-btn>
-          <div class="py-3">
-            
-          </div>
         </v-sheet>
       </v-bottom-sheet>
     </div>
@@ -125,7 +252,7 @@
 export default {
   data: () => ({
     tabModel: "tab-notice",
-    spaces: [],
+    expands: [],
     recordGroup: [
       {
         groupKey: "notice",
@@ -133,8 +260,20 @@ export default {
         groupValues: [],
       },
     ],
-    newNoticeTask: null,
-    sheet: false,
+    editLoading: false,
+    editErrorMessageShow: false,
+    editErrorMessage: "",
+    editWindow: false,
+    editRecord: {},
+    pickDateModal: false,
+    pickDateTimeModal: false,
+    titleRules: [
+      value => !!value || '请输入主题信息',
+      value => value.length <= 20 || '超过字数限制'
+    ],
+    contentRules: [
+      value => value.length <= 35 || '超过字数限制'
+    ]
   }),
   computed: {
     completedRecordCount() {
@@ -193,6 +332,9 @@ export default {
         if(noticesResp.data != null) {
           noticesResp.data.forEach(element => {
             console.log(element)
+            if(element.noticeTime !== "" && element.noticeTime.startsWith("0001")) {
+              element.noticeTime = "";
+            }
             let value = {
               key: element.key,
               done: element.done,
@@ -207,9 +349,8 @@ export default {
       }
     },
     async check(record) {
-      let vm = this;
+      // let vm = this;
       let resp;
-      vm.$emit('update:appOverlaySync', true);
       if(record.done) {
         // 设置为完成
         resp = await window.backend.Mo.DoneRecord(record.key);
@@ -219,19 +360,102 @@ export default {
       if(resp.code !== 200) {
         record.done = !record.done;
       }
-      vm.$emit('update:appOverlaySync', false);
     },
-    create() {
+    openEditRecord(record) {
       let vm = this;
-      // 进行全局遮罩，在查询时进行
-      vm.$emit('update:appOverlaySync', true)
+      vm.editErrorMessageShow = false;
+      vm.editErrorMessage = "";
+      vm.editRecord = {
+        key: record.key,
+        title: record.title,
+        content: record.content,
+        noticeDate: vm.splitTimeToGetDate(record.noticeTime),
+        noticeDateTime: vm.splitTimeToGetDateTime(record.noticeTime)
+      };
+      vm.editWindow = !vm.editWindow;
+    },
+    openCreateRecord() {
+      let vm = this;
+      vm.editRecord = {};
+      vm.editErrorMessageShow = false;
+      vm.editErrorMessage = "";
+      vm.editWindow = !vm.editWindow;
+    },
+    async saveRecord() {
+      let vm = this;
 
-      this.recordGroup[0].groupValues.push({
-        done: false,
-        text: this.newNoticeTask,
-      });
+      if(!vm.$refs.editWindowRef.validate()) {
+        vm.editErrorMessageShow = true;
+        vm.editErrorMessage = "请根据提示完善信息";
+        return
+      }
 
-      this.newNoticeTask = null;
+      vm.editLoading = true;
+      vm.editErrorMessageShow = false;
+      vm.editErrorMessage = "";
+
+      if(vm.editRecord.noticeDate !== "" && vm.editRecord.noticeDateTime === "") {
+        vm.editErrorMessageShow = true;
+        vm.editErrorMessage = "请补充完整提示时间";
+      }
+
+      if(vm.editRecord.noticeDate === "" && vm.editRecord.noticeDateTime !== "") {
+        vm.editErrorMessageShow = true;
+        vm.editErrorMessage = "请补充完整提示日期";
+      }
+
+      if(vm.editRecord.noticeDate !== "") {
+        vm.editRecord.noticeTime = vm.editRecord.noticeDate + " " + vm.editRecord.noticeDateTime
+      }
+      let saveResp = await window.backend.Mo.NewOrUpdateRecord(JSON.stringify(vm.editRecord));
+      if(saveResp.code === 200) {
+        vm.initWindow();
+        vm.editWindow = !vm.editWindow
+      } else {
+        vm.editErrorMessageShow = true;
+        vm.editErrorMessage = saveResp.desc;
+      }
+      vm.editLoading = false;
+    },
+    // createRecord() {
+    //   let vm = this;
+    //   // 进行全局遮罩，在查询时进行
+    //   vm.$emit('update:appOverlaySync', true)
+
+    //   this.recordGroup[0].groupValues.push({
+    //     done: false,
+    //     text: this.newNoticeTask,
+    //   });
+
+    //   this.newNoticeTask = null;
+    // },
+    triggerExpand(groupKey) {
+      let vm = this;
+      if(vm.expands && vm.expands.length > 0) {
+        vm.expands = []
+      } else {
+        let noticeRecordGroup = vm.recordGroup.find(item => item.groupKey === groupKey);
+        let length = noticeRecordGroup.groupValues.length;
+        let allIndex = [];
+        if(length>0) {
+          for (let index = 0; index < length; index++) {
+            allIndex.push(index);
+          }
+        }
+        vm.expands = allIndex
+      }
+    },
+    splitTimeToGetDate(time) {
+      if(time && time != null && time != "") {
+        return time.substr(0, 10)
+      }
+      return ""
+    },
+    splitTimeToGetDateTime(time) {
+      if(time && time != null && time != "") {
+        return time.substr(11, time.length)
+      }
+      return ""
     },
     // testNotice() {
       // debugger;

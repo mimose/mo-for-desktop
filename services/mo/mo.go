@@ -34,9 +34,9 @@ func (mo *Mo) WailsInit(runtime *wails.Runtime) error {
 }
 
 // ================ record
-// 新增记录
-func (mo *Mo) NewRecord(body string) RespInfo {
-	err := record.AddOne(body)
+// 新增/更新记录
+func (mo *Mo) NewOrUpdateRecord(body string) RespInfo {
+	err := record.AddOrUpdateOne(body)
 	if err != nil {
 		return Error(err)
 	}
