@@ -74,15 +74,28 @@
                         <v-card-text class="pt-0 pb-0 text--primary" v-text="record.content"></v-card-text>
                         <v-card-actions class="pt-0 pb-0">
                           <v-btn
-                            text
+                            icon
                             plain
                             right
-                            fixed
+                            absolute
                             color="teal accent-4"
                             @click="openEditRecord(record)"
                           >
                           <v-icon dark small>
                             mdi-pencil
+                          </v-icon>
+                          </v-btn>
+
+                          <v-btn
+                            plain
+                            right
+                            fixed
+                            icon
+                            color="teal accent-4"
+                            @click="openDelRecord(record)"
+                          >
+                          <v-icon dark small>
+                            mdi-minus
                           </v-icon>
                           </v-btn>
                         </v-card-actions>
@@ -97,6 +110,46 @@
       </v-tabs-items>
 
       <!--  -->
+      <v-dialog
+        v-model="delWindow"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            删除任务?
+          </v-card-title>
+          <v-card-text>
+            <v-alert
+                dense
+                outlined
+                type="error"
+                :value="delErrorMessageShow">
+              {{delErrorMessage}}
+              </v-alert>
+              任务删除后将无法恢复，是否删除？
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              :loading="delLoading"
+              color="green darken-1"
+              text
+              @click="delWindow = false"
+            >
+              取消
+            </v-btn>
+            <v-btn
+              :loading="delLoading"
+              color="green darken-1"
+              text
+              @click="deleteRecord"
+            >
+              确定
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </div>
 
     <div
@@ -204,7 +257,7 @@
                     :disabled="editLoading"
                     v-model="editRecord.noticeDateTime"
                     label="提示时间"
-                    append-icon="mdi-calendar"
+                    append-icon="mdi-clock"
                     readonly
                     v-bind="attrs"
                     v-on="on"
@@ -260,6 +313,12 @@ export default {
         groupValues: [],
       },
     ],
+    delWindow: false,
+    delLoading: false,
+    delErrorMessageShow: false,
+    delErrorMessage: "",
+    delRecord: {},
+
     editLoading: false,
     editErrorMessageShow: false,
     editErrorMessage: "",
@@ -361,6 +420,31 @@ export default {
         record.done = !record.done;
       }
     },
+    openDelRecord(record) {
+      let vm = this;
+      vm.delErrorMessageShow = false;
+      vm.delErrorMessage = "";
+      vm.delRecord = {};
+      vm.delRecord = record;
+      vm.delWindow = true;
+    },
+    async deleteRecord() {
+      let vm = this;
+      vm.delLoading = true;
+      vm.delErrorMessageShow = false;
+      vm.delErrorMessage = "";
+
+      let delResp = await window.backend.Mo.RemoveRecord(vm.delRecord.key);
+      if(delResp.code === 200) {
+        vm.initWindow();
+        vm.delRecord = {};
+        vm.delWindow = false;
+      } else {
+        vm.delErrorMessage = delResp.desc;
+        vm.delErrorMessageShow = true;
+      }
+      vm.delLoading = false;
+    },
     openEditRecord(record) {
       let vm = this;
       vm.editErrorMessageShow = false;
@@ -410,10 +494,11 @@ export default {
       let saveResp = await window.backend.Mo.NewOrUpdateRecord(JSON.stringify(vm.editRecord));
       if(saveResp.code === 200) {
         vm.initWindow();
+        vm.editRecord = {};
         vm.editWindow = !vm.editWindow
       } else {
-        vm.editErrorMessageShow = true;
         vm.editErrorMessage = saveResp.desc;
+        vm.editErrorMessageShow = true;
       }
       vm.editLoading = false;
     },
